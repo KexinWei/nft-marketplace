@@ -276,6 +276,12 @@ module.exports = {
         mnemonic: mnemonic(),
       },
     },
+    tenderly: {
+      url: process.env.TENDERLY_RPC_URL || "https://virtual.sepolia.rpc.tenderly.co/b7cbba86-40af-4bc2-b232-4193daa60dc9",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      chainId: 11155111,
+      gasPrice: 1000000000,
+    },
   },
   solidity: {
     compilers: [

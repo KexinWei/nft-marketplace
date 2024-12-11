@@ -367,8 +367,8 @@ function Swap({ selectedProvider, tokenListURI }) {
   const insufficientAllowance = !inputIsToken
     ? false
     : routerAllowance
-    ? parseFloat(ethers.utils.formatUnits(routerAllowance, tokens[tokenIn].decimals)) < amountIn
-    : null;
+      ? parseFloat(ethers.utils.formatUnits(routerAllowance, tokens[tokenIn].decimals)) < amountIn
+      : null;
   const formattedBalanceIn = balanceIn
     ? parseFloat(ethers.utils.formatUnits(balanceIn, tokens[tokenIn].decimals)).toPrecision(6)
     : null;

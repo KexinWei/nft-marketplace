@@ -1,97 +1,70 @@
-import { Button } from "antd";
-import React from "react";
-import { useThemeSwitcher } from "react-css-theme-switcher";
+// src/components/Account.jsx
+import React, { useEffect, useState } from "react";
+import { Button, Tooltip } from "antd";
+import { ethers } from "ethers";
 
-import Address from "./Address";
-import Balance from "./Balance";
-import Wallet from "./Wallet";
-
-/** 
-  ~ What it does? ~
-
-  Displays an Address, Balance, and Wallet as one Account component,
-  also allows users to log in to existing accounts and log out
-
-  ~ How can I use? ~
-
-  <Account
-    address={address}
-    localProvider={localProvider}
-    userProvider={userProvider}
-    mainnetProvider={mainnetProvider}
-    price={price}
-    web3Modal={web3Modal}
-    loadWeb3Modal={loadWeb3Modal}
-    logoutOfWeb3Modal={logoutOfWeb3Modal}
-    blockExplorer={blockExplorer}
-    isContract={boolean}
-  />
-
-  ~ Features ~
-
-  - Provide address={address} and get balance corresponding to the given address
-  - Provide localProvider={localProvider} to access balance on local network
-  - Provide userProvider={userProvider} to display a wallet
-  - Provide mainnetProvider={mainnetProvider} and your address will be replaced by ENS name
-              (ex. "0xa870" => "user.eth")
-  - Provide price={price} of ether and get your balance converted to dollars
-  - Provide web3Modal={web3Modal}, loadWeb3Modal={loadWeb3Modal}, logoutOfWeb3Modal={logoutOfWeb3Modal}
-              to be able to log in/log out to/from existing accounts
-  - Provide blockExplorer={blockExplorer}, click on address and get the link
-              (ex. by default "https://etherscan.io/" or for xdai "https://blockscout.com/poa/xdai/")
-**/
-
-export default function Account({
+const Account = ({
   address,
-  userSigner,
   localProvider,
+  userSigner,
   mainnetProvider,
   price,
-  minimized,
   web3Modal,
   loadWeb3Modal,
   logoutOfWeb3Modal,
   blockExplorer,
-  isContract,
-}) {
-  const { currentTheme } = useThemeSwitcher();
+  useBurner,
+}) => {
+  const [balance, setBalance] = useState("0");
 
-  let accountButtonInfo;
-  if (web3Modal?.cachedProvider) {
-    accountButtonInfo = { name: "Logout", action: logoutOfWeb3Modal };
-  } else {
-    accountButtonInfo = { name: "Connect", action: loadWeb3Modal };
-  }
+  useEffect(() => {
+    let isMounted = true; // 防止在组件卸载后更新状态
 
-  const display = !minimized && (
-    <span>
-      {address && (
-        <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} fontSize={20} />
-      )}
-      <Balance address={address} provider={localProvider} price={price} size={20} />
-      {!isContract && (
-        <Wallet
-          address={address}
-          provider={localProvider}
-          signer={userSigner}
-          ensProvider={mainnetProvider}
-          price={price}
-          color={currentTheme === "light" ? "#1890ff" : "#2caad9"}
-          size={22}
-          padding={"0px"}
-        />
-      )}
-    </span>
-  );
+    const getBalance = async () => {
+      if (address && localProvider) {
+        try {
+          const balanceBigNumber = await localProvider.getBalance(address);
+          const balanceInEther = ethers.utils.formatEther(balanceBigNumber);
+          if (isMounted) {
+            setBalance(parseFloat(balanceInEther).toFixed(4)); // 保留4位小数
+          }
+        } catch (error) {
+          console.error("获取余额失败:", error);
+          if (isMounted) {
+            setBalance("0");
+          }
+        }
+      } else {
+        setBalance("0");
+      }
+    };
 
-  return (
-    <div style={{ display: "flex" }}>
-      {display}
-      {web3Modal && (
-        <Button style={{ marginLeft: 8 }} shape="round" onClick={accountButtonInfo.action}>
-          {accountButtonInfo.name}
-        </Button>
-      )}
+    getBalance();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [address, localProvider]);
+
+  return address ? (
+    <div style={{ display: "flex", alignItems: "center" }}>
+      <Tooltip title={`地址: ${address}`}>
+        <span style={{ marginRight: "20px", fontWeight: "bold", cursor: "pointer" }}>
+          {address.slice(0, 6)}...{address.slice(-4)}
+        </span>
+      </Tooltip>
+      <Tooltip title={`余额: ${balance} ETH`}>
+        <span style={{ marginRight: "20px" }}>{balance} ETH</span>
+      </Tooltip>
+      <Button onClick={logoutOfWeb3Modal} type="primary">
+        断开连接
+      </Button>
     </div>
+  ) : (
+    <Button onClick={loadWeb3Modal} type="primary">
+      连接钱包
+    </Button>
   );
-}
+};
+
+export default Account;
