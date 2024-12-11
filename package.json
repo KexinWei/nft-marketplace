@@ -74,7 +74,7 @@
     "@nomiclabs/hardhat-etherscan": "^3.1.8",
     "@types/chai": "^5.0.1",
     "@types/node": "^22.10.1",
-    "eslint": "7.11.0",
+    "eslint": "^9.16.0",
     "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
