@@ -11,7 +11,7 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-22.04
-    
+
     strategy:
       matrix:
         node: [16.x]
@@ -30,7 +30,9 @@ jobs:
         run: npm install -g yarn
 
       - name: Verify Yarn installation
-        run: yarn --version
+        run: |
+          which yarn
+          yarn --version
 
       - name: Install dependencies
         run: yarn install --immutable --immutable-cache --check-cache
