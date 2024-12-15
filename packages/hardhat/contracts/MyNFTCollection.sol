@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 contract MyNFTCollection is ERC721URIStorage {
     uint256 public tokenIdCounter;
 
-    constructor() ERC721("MyNFTCollection", "MNFT") {}
+    constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
 
     function mintNFT(address recipient, string memory uri) public returns (uint256) {
         uint256 newTokenId = tokenIdCounter;
